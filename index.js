@@ -42,7 +42,8 @@ var defaults = {
   includeOriginal: false,
   ignoreTokens: false,
   encodeEntities: true,
-  verbose: false
+  verbose: false,
+  rootLang: ''
 };
 
 /**
@@ -83,6 +84,7 @@ function load(options) {
   }
   try {
     options.verbose && gutil.log('Loading translations from', options.locales);
+    options.verbose && gutil.log('Default Language:', options.rootLang);
     var files = fs.readdirSync(options.locales);
     var count = 0;
     for (var i in files) {
@@ -335,7 +337,11 @@ function replace(file, options) {
 
     var filePath = options.filename;
     for (var param in params) {
-      filePath = filePath.replace('${' + param + '}', params[param]);
+      if (params[param] == options.rootLang) {
+        filePath = filePath.replace('${' + param + '}', '');
+      } else {
+        filePath = filePath.replace('${' + param + '}', params[param]);
+      }
     }
     filePath = path.join(file.base,filePath);
 
@@ -347,7 +353,6 @@ function replace(file, options) {
     });
     files.push(newFile);
   }
-
 	return files;
 }
 
